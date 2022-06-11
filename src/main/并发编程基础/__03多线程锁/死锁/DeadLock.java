@@ -1,0 +1,47 @@
+package __03多线程锁.死锁;/*
+    @author wxg
+    @date 2021/12/29-12:02
+    */
+
+
+import java.util.concurrent.TimeUnit;
+
+/**
+ * @author capensis
+ */
+public class DeadLock {
+    public static void main(String[] args) {
+        //  创建两个对象
+        final Object a = new Object();
+        final Object b = new Object();
+
+        new Thread(() -> {
+            synchronized(a){
+                System.out.println(Thread.currentThread().getName() + "持有锁a, 尝试获取锁b");
+                try {
+                    TimeUnit.SECONDS.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                synchronized(b){
+                    System.out.println(Thread.currentThread().getName() + "获取锁b");
+                }
+            }
+        },"A").start();
+
+        new Thread(() -> {
+            synchronized(b){
+                System.out.println(Thread.currentThread().getName() + "持有锁b, 尝试获取锁a");
+                try {
+                    TimeUnit.SECONDS.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                synchronized(a){
+                    System.out.println(Thread.currentThread().getName() + "获取锁a");
+                }
+            }
+
+        },"B").start();
+    }
+}
